@@ -1,6 +1,7 @@
 bin/*
 dotnet/*
 mono/*
+obj/*
 *.dll
 *.pdb
 *.csproj.user
@@ -9,3 +10,4 @@ mono/*
 *~
 \#*#
 .#*
+.vs/*

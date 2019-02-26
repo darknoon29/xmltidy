@@ -1,32 +1,30 @@
 ﻿using System;
-using System.IO;
-using System.Xml;
-using System.Linq;
-using System.Xml.Linq;
 using System.Collections.Generic;
-
+using System.IO;
+using System.Xml.Linq;
 using Mono.Options;
 
-namespace XmlTidy {
+namespace xmlidy
+{
     class Program {
 
-        static bool verbose = false;
-        static bool backup = false;
+        static bool _verbose;
+        static bool _backup;
 
         static void Main(string[] args) {
-            List<string> filelist = ParseCommandLine(args);
+            List<string> fileList = ParseCommandLine(args);
             Debug("Verbose output: ON");
 
             try {
-                CheckFiles(filelist);
+                CheckFiles(fileList);
 
-                foreach (var file in filelist) {
-                    if (backup) {
+                foreach (var file in fileList) {
+                    if (_backup) {
                         Debug("Backup file: {0}", file + ".original");
                         File.Copy(file, file + ".original");
                     }
 
-                    XmlTidy(file);
+                    XTidy(file);
                 }
             } catch (FileNotFoundException fex) {
                 Console.WriteLine("{0}: {1}", fex.Message, fex.FileName);
@@ -37,7 +35,7 @@ namespace XmlTidy {
             Debug("Done!");
         }
 
-        static void XmlTidy(string filename) {
+        static void XTidy(string filename) {
             Debug("Tidy up file: {0}", filename);
             var doc = XDocument.Load(filename);
             doc.Save(filename, SaveOptions.None);
@@ -47,15 +45,15 @@ namespace XmlTidy {
             if (args.Length == 0)
                 NoInput(null);
 
-            bool showhelp = false;
-            bool showversion = false;
+            bool showHelp = false;
+            bool showVersion = false;
             List<string> ls = new List<string>();
 
             var p = new OptionSet() {  
-                { "?|h|help", "Show this help message and exit.", x => showhelp = x != null },
-                { "V|version", "Show version information and exit.", x => showversion = x != null },
-                { "v|verbose", "Increase message verbosity.", x => verbose = x != null },
-                { "b|backup", "Make a copy of input before tidying it.", x => backup = x != null },
+                { "?|h|help", "Show this help message and exit.", x => showHelp = x != null },
+                { "V|version", "Show version information and exit.", x => showVersion = x != null },
+                { "v|verbose", "Increase message verbosity.", x => _verbose = x != null },
+                { "b|backup", "Make a copy of input before tidying it.", x => _backup = x != null },
             };
 
             try {
@@ -64,12 +62,12 @@ namespace XmlTidy {
                 NoInput(oex);
             }
 
-            if (showhelp) {
+            if (showHelp) {
                 ShowUsage(p);
                 Environment.Exit(0);
             }
 
-            if (showversion) {
+            if (showVersion) {
                 ShowVersion();
                 Environment.Exit(0);
             }
@@ -114,14 +112,14 @@ namespace XmlTidy {
         }
 
         static void Debug(string format, params object[] args) {
-            if (verbose) {
+            if (_verbose) {
                 string s = string.Format(format, args);
                 Debug(s);
             }
         }
 
         static void Debug(string message) {
-            if (verbose)
+            if (_verbose)
                 Console.WriteLine(message);
         }
     }
